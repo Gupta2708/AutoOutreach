@@ -33,46 +33,22 @@ Eazyreach remains in the codebase as an optional provider boundary, but it is in
 ## Architecture
 
 ```mermaid
-flowchart TD
-    A[Typer CLI<br/>main.py] --> B[Validate domain + load Settings]
-    B --> C[Create RunContext<br/>run_id, limit, dry_run, output_dir]
-    C --> D{Mock mode?}
-
-    D -->|--mock| M1[MockDiscoveryClient]
-    D -->|real| O1[OceanClient<br/>company lookalikes]
-
-    M1 --> E[Company list]
-    O1 --> E
-
-    E --> F{Company discovery provider}
-    F -->|ocean| G[ProspeoClient<br/>search-person]
-    F -->|mock fallback| GM[MockProspeoClient]
-
-    G --> H[Decision-maker contacts]
-    GM --> H
-
-    H --> I[ProspeoClient<br/>enrich-person]
-    I --> J[Email candidates]
-
-    J --> K[Dedupe + validation]
-    K --> L[Jinja2 outreach templates]
-    L --> N[OutreachEmail models]
-
-    N --> P[Rich safety preview]
-    P --> Q{--send passed?}
-    Q -->|no| R[Dry-run SendResult records]
-    Q -->|yes| S{User types SEND?}
-    S -->|no| R
-    S -->|yes| T{--test-recipient set?}
-    T -->|yes| U[Rewrite recipient to safe inbox<br/>original recipient in body]
-    T -->|no| V[Use real prospect email]
-    U --> W[BrevoClient<br/>SMTP send]
-    V --> W
-
-    R --> X[Save artifacts]
-    W --> X
-    X --> Y[JSON + CSV + report.md]
-    X --> Z[SQLite runs.db]
+flowchart LR
+    CLI[Typer CLI] --> CTX[Validate domain<br/>RunContext]
+    CTX --> DISC[Ocean.io lookalikes<br/>or mock discovery]
+    DISC --> PEOPLE[Prospeo decision-makers]
+    PEOPLE --> EMAIL[Prospeo email enrichment]
+    EMAIL --> COPY[Dedupe + Jinja2 copy]
+    COPY --> PREVIEW[Rich safety preview]
+    PREVIEW --> GATE{--send + SEND?}
+    GATE -->|No| DRY[Dry-run results]
+    GATE -->|Yes| ROUTE{test recipient?}
+    ROUTE -->|Yes| TEST[Route to safe inbox]
+    ROUTE -->|No| REAL[Use prospect email]
+    TEST --> BREVO[Brevo send]
+    REAL --> BREVO
+    DRY --> SAVE[Artifacts + SQLite]
+    BREVO --> SAVE
 ```
 
 The pipeline is dry-run by default. Even when `--send` is passed, the user must type exactly `SEND` before Brevo is called.
