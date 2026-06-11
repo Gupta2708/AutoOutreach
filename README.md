@@ -58,8 +58,6 @@ flowchart TD
 </tr>
 </table>
 
-> **Provider note:** Eazyreach remains in the codebase as an optional provider boundary but is **disabled by default** (free API access/credits were unavailable). Prospeo replaces it for both decision-maker discovery and email enrichment.
-
 ---
 
 ## Tech Stack
