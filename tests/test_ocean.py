@@ -100,3 +100,4 @@ def test_ocean_response_parsing_with_nested_company_shape() -> None:
     )
     assert companies[0].name == "Lusha"
     assert companies[0].domain == "lusha.com"
+    assert companies[0].similarity_score_label == "A"

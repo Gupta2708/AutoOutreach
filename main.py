@@ -236,7 +236,7 @@ async def _test_ocean(settings: Settings, domain: str, *, debug: bool) -> None:
     table.add_column("Domain")
     table.add_column("Score")
     for company in companies:
-        table.add_row(company.name or "", company.domain, str(company.similarity_score or ""))
+        table.add_row(company.name or "", company.domain, _format_company_score(company))
     console.print(table)
 
 
@@ -302,6 +302,14 @@ def _save_ocean_probe(settings: Settings, result: OceanDebugResult) -> Path:
     path = debug_dir / f"ocean_probe_{timestamp}.json"
     path.write_text(json.dumps(debug_result_to_dict(result), indent=2), encoding="utf-8")
     return path
+
+
+def _format_company_score(company: Company) -> str:
+    if company.similarity_score_label:
+        return company.similarity_score_label
+    if company.similarity_score is None:
+        return ""
+    return f"{company.similarity_score:g}"
 
 
 async def _test_prospeo(settings: Settings, domain: str) -> None:

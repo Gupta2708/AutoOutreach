@@ -187,14 +187,14 @@ class OceanClient:
             if not domain:
                 logger.warning("Skipping Ocean company without domain: %s", row)
                 continue
+            score = get_nested_value(row, self.company_score_field)
             companies.append(
                 Company(
                     name=_as_optional_str(get_nested_value(row, self.company_name_field)),
                     domain=str(domain),
                     source="ocean",
-                    similarity_score=_as_optional_float(
-                        get_nested_value(row, self.company_score_field)
-                    ),
+                    similarity_score=_as_optional_float(score),
+                    similarity_score_label=_as_optional_str(score),
                 )
             )
             if len(companies) >= limit:

@@ -19,6 +19,7 @@ class Company(AppModel):
     domain: str
     source: str
     similarity_score: float | None = None
+    similarity_score_label: str | None = None
 
 
 class Contact(AppModel):
